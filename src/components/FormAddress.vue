@@ -9,14 +9,14 @@
     <form class="form">
       <div class="form-group">
         <label class="form-label" for="delivery_name">Name</label>
-        <input v-model="$v.form.recipient.$model" type="text" placeholder="Recipients Name" class="form-control" id="delivery_name">
-        <div v-if="$v.form.recipient.$error" class="error">field is required</div>
+        <input v-model="v$.form.recipient.$model" type="text" placeholder="Recipients Name" class="form-control" id="delivery_name">
+        <div v-if="v$.form.recipient.$error" class="error">field is required</div>
       </div>
 
       <div class="form-group">
         <label class="form-label" for="address">Address</label>
-        <textarea v-model="$v.form.address.$model" placeholder="London Street 470978 New England" rows="3" class="form-control" id="address"></textarea>
-        <div v-if="$v.form.address.$error" class="error">field is required</div>
+        <textarea v-model="v$.form.address.$model" placeholder="London Street 470978 New England" rows="3" class="form-control" id="address"></textarea>
+        <div v-if="v$.form.address.$error" class="error">field is required</div>
       </div>
     </form>
   </div>

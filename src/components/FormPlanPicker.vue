@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <!-- <div v-if="$v.selectedPlan.$error" class="error">you should pick a plan to continue</div> -->
+    <div v-if="v$.selectedPlan.$error" class="error">you should pick a plan to continue</div>
   </div>
 </template>
 
