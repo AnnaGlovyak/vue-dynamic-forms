@@ -40,6 +40,7 @@
   import {required} from '@vuelidate/validators'
 
   export default {
+    emits: ['update'],
     setup () {
       return { v$: useVuelidate() }
     },
@@ -78,6 +79,9 @@
     methods: {
       pickPlan (plan) {
         this.selectedPlan = plan
+        this.$emit('update', {
+          plan: this.selectedPlan
+        })
       }
     }
   }
