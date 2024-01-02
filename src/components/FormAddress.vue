@@ -23,17 +23,27 @@
 </template>
 
 <script>
-  import { useVuelidate } from '@vuelidate/core'
+  import {toRefs} from "vue"
+  import {useVuelidate} from '@vuelidate/core'
   import {required} from '@vuelidate/validators'
   export default {
-    setup () {
-      return { v$: useVuelidate() }
+    props: {
+      wizarData: {
+        type: Object,
+        required: true,
+      }
+    },
+    setup (props) {
+      const data = toRefs(props.wizarData)
+      return {
+        data,
+        v$: useVuelidate() }
     },
     data () {
       return {
         form: {
           address: null,
-          recipient: null
+          recipient: this.data.name,
         }
       }
     },
