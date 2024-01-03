@@ -3,6 +3,7 @@
     <keep-alive>
       <component
         :is="currentStep"
+        ref="currentStepRef"
         :wizarData="form"
         @update="processStep"
       />
@@ -82,6 +83,7 @@ export default {
       console.log("HAVE STAP DATA FROM EMIT", step);
       Object.assign(this.form, step.data)
       this.canGoNext = step.valid
+      console.log(this.$refs.currentStepRef);
     },
     goBack () {
       this.currentStepNumber--
@@ -89,7 +91,11 @@ export default {
     },
     goNext () {
       this.currentStepNumber++
-      this.canGoNext = false
+      this.$nextTick(() => {
+        this.canGoNext = !this.$refs.currentStepRef.v$.$invalid
+        // or calll submit method 
+        // this.$refs.currentStepRef.submit()
+      })
     }
   }
 }

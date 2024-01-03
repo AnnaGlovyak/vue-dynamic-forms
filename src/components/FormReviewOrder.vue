@@ -75,12 +75,16 @@
 </template>
 
 <script>
+  import { useVuelidate } from '@vuelidate/core'
   export default {
     props: {
       wizarData: {
         type: Object,
         required: true,
       }
+    },
+    setup () {
+      return { v$: useVuelidate() }
     },
     data () {
       return {
@@ -89,6 +93,9 @@
           otherTreat: false
         }
       }
+    },
+    validations () {
+      return {}
     },
     computed: {
       totalPrice () {
