@@ -18,7 +18,7 @@
       <div class="form-group">
         <label class="form-label" for="password">Password</label>
         <input v-model="v$.form.password.$model" type="password" placeholder="Super Secret Password" class="form-control" id="password">
-        <div v-if="v$.form.password.$error && !v$.form.password.required" class="error">password is required</div>
+        <div v-if="v$.form.password.$error" class="error">password is required</div>
       </div>
 
 
@@ -65,13 +65,14 @@
     },
     methods: {
       submit () {
-        if (!this.v$.$invalid) {
-          this.$emit('update', {
+        this.$emit('update', {
+            data: {
             email: this.form.email,
             password: this.form.password,
             name: this.form.name
-          })
-        }
+          },
+          valid: !this.v$.$invalid
+        })
       }
     }
   }

@@ -1,10 +1,12 @@
 <template>
   <div>
-    <component
-      :is="currentStep"
-      :wizarData="form"
-      @update="processStep"
-    />
+    <keep-alive>
+      <component
+        :is="currentStep"
+        :wizarData="form"
+        @update="processStep"
+      />
+    </keep-alive>
 
     <div class="progress-bar">
       <div :style="`width: ${progress}%;`"></div>
@@ -76,13 +78,14 @@ export default {
     }
   },
   methods: {
-    processStep (stepData) {
-      console.log("HAVE STAP DATA FROM EMIT", stepData);
-      Object.assign(this.form, stepData)
-      this.canGoNext = true;
+    processStep (step) {
+      console.log("HAVE STAP DATA FROM EMIT", step);
+      Object.assign(this.form, step.data)
+      this.canGoNext = step.valid
     },
     goBack () {
       this.currentStepNumber--
+      this.canGoNext = true
     },
     goNext () {
       this.currentStepNumber++
