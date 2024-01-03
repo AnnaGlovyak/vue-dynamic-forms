@@ -1,34 +1,42 @@
 <template>
   <div>
-    <keep-alive>
-      <component
-        :is="currentStep"
-        ref="currentStepRef"
-        :wizarData="form"
-        @update="processStep"
-      />
-    </keep-alive>
+    <div v-if="wizarsInProcess">
+      <keep-alive>
+        <component
+          :is="currentStep"
+          ref="currentStepRef"
+          :wizarData="form"
+          @update="processStep"
+        />
+      </keep-alive>
 
-    <div class="progress-bar">
-      <div :style="`width: ${progress}%;`"></div>
+      <div class="progress-bar">
+        <div :style="`width: ${progress}%;`"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="buttons">
+        <button
+          @click="goBack"
+          v-if="currentStepNumber > 1"
+          class="btn-outlined"
+        >Back
+        </button>
+        <button
+          @click="nextButtonAction"
+          :disabled="!canGoNext"
+          class="btn"
+        >{{ isLastStep ? 'Complete order' : 'Next' }}</button>
+      </div>
+
+      <pre><code>{{form}}</code></pre>
     </div>
-
-    <!-- Actions -->
-    <div class="buttons">
-      <button
-        @click="goBack"
-        v-if="currentStepNumber > 1"
-        class="btn-outlined"
-      >Back
-      </button>
-      <button
-        @click="goNext"
-        :disabled="!canGoNext"
-        class="btn"
-      >Next</button>
+    <div v-else>
+      <h1 class="title">Thank you!</h1>
+      <h2 class="subtitle">
+        We look forward to shipping you your first box!
+      </h2>
     </div>
-
-    <pre><code>{{form}}</code></pre>
   </div>
 </template>
 
@@ -76,6 +84,12 @@ export default {
     },
     progress () {
       return this.currentStepNumber/this.length * 100
+    },
+    isLastStep () {
+      return this.currentStepNumber === this.length
+    },
+    wizarsInProcess () {
+      return this.currentStepNumber <= this.length
     }
   },
   methods: {
@@ -96,6 +110,19 @@ export default {
         // or calll submit method 
         // this.$refs.currentStepRef.submit()
       })
+    },
+    nextButtonAction () {
+      if (this.isLastStep) {
+        this.submitOrder()
+      }
+      else {
+        this.goNext()
+      }
+    },
+    submitOrder () {
+      // do ajax request
+      console.log("Order submited")
+      this.currentStepNumber++
     }
   }
 }
