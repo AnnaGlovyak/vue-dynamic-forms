@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="wizarsInProcess">
+    <div v-if="wizarsInProcess" v-show="asyncState !== 'pending'">
       <keep-alive>
         <component
           :is="currentStep"
@@ -37,6 +37,13 @@
         We look forward to shipping you your first box!
       </h2>
     </div>
+
+    <div class="loading-wrapper" v-if="asyncState === 'pending'">
+       <div class="loader">
+         <img src="/spinner.svg" alt="">
+         <p>Please wait, we're hitting our servers!</p>
+       </div>
+     </div>
   </div>
 </template>
 
@@ -45,6 +52,8 @@ import FormPlanPicker from './FormPlanPicker.vue'
 import FormUserDetails from './FormUserDetails.vue'
 import FormAddress from './FormAddress.vue'
 import FormReviewOrder from './FormReviewOrder.vue'
+// api
+import {postFormToDB} from "../api"
 export default {
   name: 'FormWizard',
   components: {
@@ -57,6 +66,7 @@ export default {
     return {
       currentStepNumber: 1,
       canGoNext: false,
+      asyncState: null,
       form: {
         plan: null,
         email: null,
@@ -120,9 +130,13 @@ export default {
       }
     },
     submitOrder () {
-      // do ajax request
-      console.log("Order submited")
-      this.currentStepNumber++
+      this.asyncState = 'pending';
+      postFormToDB(this.form)
+        .then(() => {
+          console.log("Order submited");
+          this.asyncState = 'success';
+          this.currentStepNumber++;
+        })
     }
   }
 }
