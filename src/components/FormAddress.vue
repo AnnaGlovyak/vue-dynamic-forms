@@ -59,6 +59,14 @@
         }
       }
     },
+    activated () {
+      this.form.name = this.wizarData.name;
+    },
+    // watch: { // ALSO OPTION, BUT LESS OPTIMIZED
+    //   'wizarData.name' (value) {
+    //     this.form.name = value;
+    //   }
+    // },
     methods: {
       submit() {
         this.$emit('update', {
