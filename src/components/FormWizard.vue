@@ -7,6 +7,7 @@
           ref="currentStepRef"
           :wizarData="form"
           @update="processStep"
+          @updateAsyncState="updateAsyncState"
         />
       </keep-alive>
 
@@ -137,6 +138,9 @@ export default {
           this.asyncState = 'success';
           this.currentStepNumber++;
         })
+    },
+    updateAsyncState (state) {
+      this.asyncState = state;
     }
   }
 }
