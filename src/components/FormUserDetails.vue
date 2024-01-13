@@ -9,18 +9,20 @@
     <form
       v-if="!loggedIn"
       class="form"
-      @input="submit"
     >
       <div class="form-group">
         <label class="form-label" for="email">Email</label>
         <input
           type="text"
           v-model="v$.form.email.$model"
-          @blur="checkIfUserExist"
           placeholder="your@email.com"
           class="form-control"
           id="email"
+          :disabled="emailCheckedInDB"
         />
+        <div v-if="emailCheckedInDB" class="error info">
+          <a href="#" @click="reset">Not you?</a>
+        </div>
         <!-- <div v-if="v$.form.email.$error" class="error">email is required</div> -->
         <div v-if="v$.form.email.$error" class="error">email is invalid</div>
       </div>
@@ -31,10 +33,6 @@
         <input v-model="v$.form.password.$model" type="password" placeholder="Super Secret Password" class="form-control" id="password">
         <div v-if="v$.form.password.$error" class="error">password is required</div>
         <!-- <div v-if="v$.form.password.$error && !v$.form.password.correct" class="error">password is invalid - try again</div> -->
-      </div>
-
-      <div v-if="existingUser" class="form-group">
-        <button @click.prevent="login" class="btn">Login</button>
       </div>
 
       <div v-if="!existingUser && emailCheckedInDB" class="form-group">
@@ -96,14 +94,38 @@
     },
     methods: {
       submit () {
-        this.$emit('update', {
-            data: {
-            email: this.form.email,
-            password: this.form.password,
-            name: this.form.name
-          },
-          valid: !this.v$.$invalid
-        })
+        let job;
+        if (!this.emailCheckedInDB) {
+          this.v$.form.email.$touch();
+          job = this.checkIfUserExist();
+        }
+        else {
+          console.log(this.existingUser && !this.loggedIn);
+          if (this.existingUser && !this.loggedIn) {
+            this.v$.form.password.$touch();
+            job = this.login();
+          }
+          else {
+            this.v$.$touch();
+            job = Promise.resolve();
+          }
+        }
+
+        return new Promise((resolve, reject) => {
+          job.then(() => {
+            if (!this.v$.$invalid) {
+              resolve({
+                email: this.form.email,
+                password: this.form.password,
+                name: this.form.name
+              });
+            }
+            else {
+              reject('data is not valid yet');
+            }
+          })
+          .catch(error => reject(error));
+        });
       },
       checkIfUserExist () {
         if (!this.v$.form.email.$invalid) {
@@ -117,7 +139,11 @@
             .catch(() => {
               this.existingUser = false;
               this.emailCheckedInDB = true;
+              this.$emit('updateAsyncState', 'success');
             })
+        }
+        else {
+          return Promise.reject('email is invalid');
         }
       },
       login () {
@@ -127,12 +153,15 @@
           return authenticateUser(this.form.email, this.form.password)
             .then(user => {
               this.form.name = user.name;
-              this.submit();
               this.$emit('updateAsyncState', 'success');
             })
             .catch(() => {
               this.wrongPassword = true;
+              this.$emit('updateAsyncState', 'success');
             })
+        }
+        else {
+          return Promise.reject('password is invalid');
         }
       },
       reset () {
@@ -142,7 +171,7 @@
         this.emailCheckedInDB = false;
         this.existingUser = false;
         this.wrongPassword = false;
-        this.v$.reset();
+        this.v$.$reset();
       }
     }
   }

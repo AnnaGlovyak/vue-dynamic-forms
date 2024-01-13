@@ -6,7 +6,6 @@
           :is="currentStep"
           ref="currentStepRef"
           :wizarData="form"
-          @update="processStep"
           @updateAsyncState="updateAsyncState"
         />
       </keep-alive>
@@ -25,7 +24,6 @@
         </button>
         <button
           @click="nextButtonAction"
-          :disabled="!canGoNext"
           class="btn"
         >{{ isLastStep ? 'Complete order' : 'Next' }}</button>
       </div>
@@ -66,7 +64,6 @@ export default {
   data () {
     return {
       currentStepNumber: 1,
-      canGoNext: false,
       asyncState: null,
       form: {
         plan: null,
@@ -104,31 +101,24 @@ export default {
     }
   },
   methods: {
-    processStep (step) {
-      console.log("HAVE STAP DATA FROM EMIT", step);
-      Object.assign(this.form, step.data)
-      this.canGoNext = step.valid
-      console.log(this.$refs.currentStepRef);
-    },
     goBack () {
       this.currentStepNumber--
-      this.canGoNext = true
     },
     goNext () {
-      this.currentStepNumber++
-      this.$nextTick(() => {
-        this.canGoNext = !this.$refs.currentStepRef.v$.$invalid
-        // or calll submit method 
-        // this.$refs.currentStepRef.submit()
-      })
+      this.currentStepNumber++;
     },
     nextButtonAction () {
-      if (this.isLastStep) {
-        this.submitOrder()
-      }
-      else {
-        this.goNext()
-      }
+      this.$refs.currentStepRef.submit()
+        .then(stepData => {
+          Object.assign(this.form, stepData);
+          if (this.isLastStep) {
+            this.submitOrder()
+          }
+          else {
+            this.goNext()
+          }
+        })
+        .catch(error => console.log(error))
     },
     submitOrder () {
       this.asyncState = 'pending';
